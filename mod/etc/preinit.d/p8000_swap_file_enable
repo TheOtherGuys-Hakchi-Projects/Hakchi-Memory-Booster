@@ -1,8 +1,8 @@
 # Swingflip - HakchiResources.com https://discord.gg/8gygsrw
 
-if [ -f "/media/256MB.swap" ]; then 
+if [ -f "$mountpoint/media/256MB.swap" ]; then 
     echo "Enabling Memory Booster..." > /dev/tty0 
-    swapon /media/256MB.swap &> /dev/tty0
+    swapon $mountpoint/media/256MB.swap &> /dev/tty0
 else
     ok=1
 
@@ -24,10 +24,15 @@ else
     echo -e "${Green}***************************************" > /dev/tty0
     echo -e "${Yellow}  By Swingflip / HakchiResources.com   " > /dev/tty0
 
+    echo -e "${Cyan}--DEBUG--" > /dev/tty0
+    ls -la $mountpoint/media > /dev/tty0 
+    lsblk > /dev/tty0
+    echo -e "${Cyan}--DEBUG--" > /dev/tty0
+
     echo -e "${White}Running media read write test on USB/SD..." > /dev/tty0
 
-    touch "/media/test" || ok=0
-    rm "/media/test" || ok=0
+    touch "$mountpoint/media/test" || ok=0
+    rm "$mountpoint/media/test" || ok=0
 
     if [ "$ok" == "0" ]; then
         echo -e "${White}[${Red}FAILED${White}] Couldn't write to USB/SD. Make sure you have an USB/SD mounted and try again!" > /dev/tty0
@@ -36,12 +41,12 @@ else
         echo -e "${White}Creating and intialising 256MB swap file on USB/SD root (256MB.swap)..." > /dev/tty0
 
         #This is where the magic happens...
-        fallocate -l 256MB /media/256MB.swap &> /dev/tty0 #Pls no xtreme 1GB swap
-        dd if=/dev/zero of=/media/256MB.swap bs=1M count=256 &> /dev/tty0
-        chmod 600 /media/256MB.swap &> /dev/tty0
-        mkswap /media/256MB.swap &> /dev/tty0
+        fallocate -l 256MB $mountpoint/media/256MB.swap &> /dev/tty0 #Pls no xtreme 1GB swap
+        dd if=/dev/zero of=$mountpoint/media/256MB.swap bs=1M count=256 &> /dev/tty0
+        chmod 600 $mountpoint/media/256MB.swap &> /dev/tty0
+        mkswap $mountpoint/media/256MB.swap &> /dev/tty0
 
-        if [ ! -f "/media/256MB.swap" ]; then
+        if [ ! -f "$mountpoint/media/256MB.swap" ]; then
             echo -e "${White}[${Red}FAILED${White}] Couldn't create and initialise the swap file! Check the output and try again!" > /dev/tty0
             sleep 3 #Let the fail soak in for a bit.
             return 99
@@ -53,7 +58,7 @@ else
 
             sleep 2
             echo "Enabling Memory Booster..." > /dev/tty0 
-            swapon /media/256MB.swap &> /dev/tty0
+            swapon $mountpoint/media/256MB.swap &> /dev/tty0
         fi
     fi
 fi
