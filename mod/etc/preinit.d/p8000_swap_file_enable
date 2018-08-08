@@ -1,0 +1,1 @@
+[ -f "/media/256MB.swap" ] && echo "Enabling Memory Booster..." > /dev/tty0 && swapon /media/256MB.swap &> /dev/tty0
