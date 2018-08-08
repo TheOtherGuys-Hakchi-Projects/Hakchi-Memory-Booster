@@ -14,7 +14,7 @@ Without the booster, Mario Kart 64 on idle will crash after about 40 minutes of 
 
 1. Make sure you have either a USB or SD card plugged into your mini so (/media) is mounted. (This mod will take up 256mb of space on the USB/SD!)
 2. Install the Hakchi Memory Booster via Hakchi CE.
-3. Whilst installing, it will display the progress to the screen via HDMI. It will take a little while as it builds the swap file.
-4. Once complete it will reboot and you are good to go!
+3. On first boot after install it will set up the memory boost (1 time only) and it will display the progress to the TV.
+4. Once complete it will enable and you are good to go!
 
 You can get further support at the support channel at the discord here: [Hakchi Resources Discord](https://discord.gg/8gygsrw)
