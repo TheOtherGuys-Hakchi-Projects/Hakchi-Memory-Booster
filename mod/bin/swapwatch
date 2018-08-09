@@ -1,0 +1,61 @@
+#!/bin/sh
+# XorLoser - Swapfile benchmark tool v1.0
+
+log_file="/media/swapwatch.log"
+tick_resolution_seconds=2
+prev_swap_usage="$(free | grep Swap | awk '{print $3}')"
+curr_swap_usage="$prev_swap_usage"
+max_swap_usage=0
+
+get_MB_size() {
+  local val_KB=$1
+  val_MB_a=$((val_KB/1024))
+  val_MB_b=$(( ((val_KB-(val_MB_a*1024))*100)/1024 ))
+  if [ "$val_MB_b" -lt "0" ]; then
+    val_MB_b=$((0-val_MB_b))
+    if [ "$val_MB_a" -ge "0" ]; then
+      val_MB_a=-"$val_MB_a"
+    fi
+  fi
+  # 2 numbers after decimal point
+  if [ ${#val_MB_b} -lt "2" ]; then
+    val_MB_b="$val_MB_b"0
+  fi
+  # 3 numbers before decimal point
+  if [ ${#val_MB_a} -eq "1" ]; then
+    val_MB_a="  $val_MB_a"
+  elif [ ${#val_MB_a} -eq "2" ]; then
+    val_MB_a=" $val_MB_a"
+  fi
+  echo "$val_MB_a.$val_MB_b"
+}
+
+finish_up() {
+  echo 
+  echo "$(date +%H:%M:%S)  Max swap usage was $(get_MB_size "$max_swap_usage") MB" | tee -a "$log_file"
+  exit 0
+}
+
+swap_total_size="$(free | grep Swap | awk '{print $2}')"
+echo  | tee -a "$log_file"
+echo "swap total size is $(get_MB_size "$swap_total_size") MB" | tee -a "$log_file"
+if [ "$swap_total_size" = "0" ]; then
+  echo "Error no swap file in use! Please enable swap usage by using: swapon" | tee -a "$log_file"
+  exit 1
+fi
+
+echo "Watching swap usage - press ctrl-c to quit" | tee -a "$log_file"
+echo "Time     Current     Change" | tee -a "$log_file"
+trap finish_up INT
+while :
+do
+  curr_swap_usage="$(free | grep Swap | awk '{print $3}')"
+  if [ "$prev_swap_usage" != "$curr_swap_usage" ]; then
+    echo "$(date +%H:%M:%S)  $(get_MB_size "$curr_swap_usage")  :  $(get_MB_size $((curr_swap_usage-prev_swap_usage)))" | tee -a "$log_file"
+  fi
+  if [ "$curr_swap_usage" -gt "$max_swap_usage" ]; then
+    max_swap_usage="$curr_swap_usage"
+  fi
+  prev_swap_usage=$curr_swap_usage
+  sleep $tick_resolution_seconds
+done
